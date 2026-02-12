@@ -1,5 +1,5 @@
 # Étape 1 : Build le projet
-FROM maven:3.9.3-eclipse-temurin-21 AS build
+FROM maven:3.9.3-eclipse-temurin-21-jdk AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
