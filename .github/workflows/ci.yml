@@ -1,4 +1,4 @@
-name: Java CI Pipeline
+name: Java CI + Docker
 
 on:
   push:
@@ -10,14 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout du repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 21
+      # 2️⃣ Installer Java + Maven
+      - name: Set up Java 21 with Maven
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
+          cache: maven
 
+      # 3️⃣ Build Java & Tests
       - name: Build with Maven
-        run: mvn clean install
+        run: mvn -B clean install
+
+      # 4️⃣ Login DockerHub
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 5️⃣ Build Docker image
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKERHUB_USER }}/calculator:latest .
+
+      # 6️⃣ Push Docker image
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKERHUB_USER }}/calculator:latest
